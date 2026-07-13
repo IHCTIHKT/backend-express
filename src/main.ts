@@ -3,8 +3,7 @@
 // POST /login
 // GET /users/:id
 // Вывести с помощью pino
-import express from 'express';
-import { faker } from '@faker-js/faker';
+import express from 'express';;
 import pino from 'pino';
 
 const logger = pino();
@@ -12,7 +11,7 @@ const server = express();
 server.use(express.json());
 
 server.listen(2000, () => {
-  logger.info('Сервер запущен на порту 2000');
+  logger.info('Server is running on port 2000');
 });
 
 type OrderOfYandexDelivery = {
