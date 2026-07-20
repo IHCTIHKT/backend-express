@@ -1,33 +1,112 @@
-const js = require('@eslint/js');
-const tseslint = require('@typescript-eslint/eslint-plugin');
-const tsparser = require('@typescript-eslint/parser');
-const prettier = require('eslint-config-prettier');
+"prettier": {
+    "singleQuote": true,
+      "trailingComma": "all",
+      "printWidth": 120,
+      "tabWidth": 2,
+      "endOfLine": "auto"
+},
+const eslint = require('@eslint/js');
+const typescriptEslintEslintPlugin = require('@typescript-eslint/eslint-plugin');
+const tsParser = require('@typescript-eslint/parser');
+const eslintConfigPrettier = require('eslint-config-prettier');
+const importPlugin = require('eslint-plugin-import');
+const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended');
+const simpleImportSort = require('eslint-plugin-simple-import-sort');
+const unusedImports = require('eslint-plugin-unused-imports');
+const tseslint = require('typescript-eslint');
+const tsImportResolver = require('eslint-import-resolver-typescript');
 
 module.exports = [
-    js.configs.recommended,
+    ...tseslint.config(eslint.configs.recommended, ...tseslint.configs.recommended),
+    eslintConfigPrettier,
+    importPlugin.flatConfigs.recommended,
     {
-        files: ['src/**/*.ts'],
+        plugins: {
+            '@typescript-eslint': typescriptEslintEslintPlugin,
+            'simple-import-sort': simpleImportSort,
+            'unused-imports': unusedImports,
+            'eslint-import-resolver-typescript': tsImportResolver,
+        },
         languageOptions: {
-            parser: tsparser,
+            parser: tsParser,
+            ecmaVersion: 'latest',
+            sourceType: 'module',
+
             parserOptions: {
-                ecmaVersion: 2022,
-                sourceType: 'module',
-            },
-            globals: {
-                console: 'readonly',
-                process: 'readonly',
-                __dirname: 'readonly',
-                __filename: 'readonly',
+                project: 'tsconfig.json',
             },
         },
-        plugins: {
-            '@typescript-eslint': tseslint,
+        settings: {
+            'import/resolver': {
+                typescript: true,
+                node: true,
+            },
         },
         rules: {
-            ...tseslint.configs.recommended.rules,
-            '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-            '@typescript-eslint/no-explicit-any': 'warn',
+            'no-unused-vars': 'off',
+            '@typescript-eslint/await-thenable': 'error',
+            '@typescript-eslint/no-explicit-any': 'error',
+            '@typescript-eslint/no-unused-vars': 'off',
+            '@typescript-eslint/no-non-null-assertion': 'warn',
+            '@typescript-eslint/no-empty-object-type': 'error',
+
+            '@typescript-eslint/explicit-function-return-type': 'off',
+            '@typescript-eslint/explicit-module-boundary-types': 'off',
+
+            'import/first': 'warn',
+            'import/newline-after-import': 'warn',
+            'import/no-duplicates': 'warn',
+            'unused-imports/no-unused-imports': 'warn',
+            'simple-import-sort/imports': [
+                'warn',
+                {
+                    groups: [['^\\u0000', '^@?\\w', '^[^.]', '^\\.']],
+                },
+            ],
+
+            camelcase: 'error',
+            'consistent-return': 'error',
+            'default-case': 'off',
+            eqeqeq: 'error',
+            'object-shorthand': 'warn',
+            'max-classes-per-file': 'off',
+            'no-console': 'off',
+            'no-eval': 'error',
+            'no-alert': 'error',
+            'no-compare-neg-zero': 'warn',
+            'no-case-declarations': 'off',
+            'no-else-return': 'warn',
+            'no-empty': 'warn',
+            'no-extend-native': 'error',
+            'no-invalid-this': 'error',
+            'no-iterator': 'error',
+            'no-labels': 'error',
+            'no-loop-func': 'error',
+            'no-new': 'error',
+            'no-new-func': 'error',
+            'no-new-wrappers': 'error',
+            'no-prototype-builtins': 'off',
+            'no-self-compare': 'error',
+            'no-sequences': 'error',
+            'no-throw-literal': 'error',
+            'no-unmodified-loop-condition': 'error',
+            'no-useless-concat': 'warn',
+            'no-useless-escape': 'warn',
+            'no-useless-return': 'warn',
+            'no-var': 'error',
+            'no-void': 'error',
+            'no-with': 'error',
+            'spaced-comment': 'warn',
+
+            curly: ['error', 'all'],
         },
     },
-    prettier,
+    {
+        files: ['**/*.js', '**/*.mjs'],
+        rules: {
+            '@typescript-eslint/no-require-imports': 'off',
+            'no-undef': 'off',
+        },
+    },
+    eslintPluginPrettierRecommended,
 ];
