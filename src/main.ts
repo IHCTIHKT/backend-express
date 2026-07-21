@@ -20,7 +20,7 @@ type OrderOfYandexDelivery = {
 };
 
 const orders: OrderOfYandexDelivery[] = [];
-server.post('/order/', (req, res) => {
+server.post('/order', (req, res) => {
   const { name, order  } = req.body;
 
   if (typeof name !== 'string' || typeof order !== 'string') {
@@ -41,7 +41,7 @@ server.post('/order/', (req, res) => {
   res.json(newOrder);
 });
 
-server.get('/order/', (req, res) => {
+server.get('/order', (req, res) => {
   logger.info(`Список из ${orders.length} ваших заказов`);
   res.json(orders);
 });
