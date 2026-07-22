@@ -3,10 +3,9 @@
 // POST /login
 // GET /users/:id
 // Вывести с помощью pino
-import express from 'express';;
-import pino from 'pino';
+import express from 'express';
+import logger from './logger/index';
 
-const logger = pino();
 const server = express();
 server.use(express.json());
 
@@ -21,7 +20,7 @@ type OrderOfYandexDelivery = {
 };
 
 const orders: OrderOfYandexDelivery[] = [];
-server.post('/orderInfo/', (req, res) => {
+server.post('/order', (req, res) => {
   const { name, order  } = req.body;
 
   if (typeof name !== 'string' || typeof order !== 'string') {
@@ -42,12 +41,12 @@ server.post('/orderInfo/', (req, res) => {
   res.json(newOrder);
 });
 
-server.get('/ordersList/', (req, res) => {
+server.get('/order', (req, res) => {
   logger.info(`Список из ${orders.length} ваших заказов`);
   res.json(orders);
 });
 
-server.get('/orders/:id', (req, res) => {
+server.get('/order/:id', (req, res) => {
   const id = Number(req.params.id);
   const foundOrder = orders.find((order) => order.id === id);
 
