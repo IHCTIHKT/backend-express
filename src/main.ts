@@ -1,12 +1,12 @@
 import express from 'express';
 import logger from './logger/index';
-import taskRouter from './modules/task/task.router';
+import orderRouter from './modules/order/order.router';
 import userRouter from './modules/user/user.router';
 import { logRoutes } from './bootstrap/log-routes';
 
 const server = express();
 server.use(express.json());
-server.use('/task', taskRouter);
+server.use('/order', orderRouter);
 server.use('/user', userRouter);
 logRoutes(server);
 
