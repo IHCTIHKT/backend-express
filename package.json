@@ -7,7 +7,8 @@
   "scripts": {
     "start": "ts-node src/main.ts",
     "build": "eslint . && tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint:src": "eslint src/ --max-warnings 0"
   },
   "prettier": {
     "singleQuote": true,
