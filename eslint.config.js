@@ -3,7 +3,6 @@ const typescriptEslintEslintPlugin = require('@typescript-eslint/eslint-plugin')
 const tsParser = require('@typescript-eslint/parser');
 const eslintConfigPrettier = require('eslint-config-prettier');
 const importPlugin = require('eslint-plugin-import');
-const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended');
 const simpleImportSort = require('eslint-plugin-simple-import-sort');
 const unusedImports = require('eslint-plugin-unused-imports');
 const tseslint = require('typescript-eslint');
@@ -101,5 +100,4 @@ module.exports = [
       'no-undef': 'off',
     },
   },
-  eslintPluginPrettierRecommended,
 ];

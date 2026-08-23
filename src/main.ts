@@ -1,4 +1,4 @@
-//Добавить эндпоинты:
+// Добавить эндпоинты:
 // POST /register
 // POST /login
 // GET /users/:id
@@ -21,7 +21,7 @@ type OrderOfYandexDelivery = {
 
 const orders: OrderOfYandexDelivery[] = [];
 server.post('/order', (req, res) => {
-  const { name, order  } = req.body;
+  const { name, order } = req.body;
 
   if (typeof name !== 'string' || typeof order !== 'string') {
     const message = 'Имя или заказ не переданы либо пустые';
@@ -32,8 +32,8 @@ server.post('/order', (req, res) => {
 
   const newOrder: OrderOfYandexDelivery = {
     id: orders.length + 1,
-    name: name,
-    order: order,
+    name,
+    order,
   };
 
   orders.push(newOrder);
