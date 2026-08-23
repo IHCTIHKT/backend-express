@@ -2,11 +2,12 @@ import { faker } from '@faker-js/faker';
 
 export type OrderMock = {
   id: number;
-  name: string;
-  order: string;
+  username: string;
+  restaurant: string;
+  items: string[];
 };
 
-export const getMockOrder = (maxCount?: number) => {
+export const getmockorder = (maxCount?: number) => {
   const createMockOrder = () => ({
     id: faker.number.int({ min: 1, max: 1000 }),
     name: faker.lorem.words({ min: 1, max: 5 }),

@@ -1,13 +1,8 @@
 import express from 'express';
 import logger from '../../logger/index';
-import { getMockOrder } from '../../mocks/getMockOrder';
+import { getmockorder } from '../../mocks/getmockorder';
 
 const orderRouter = express.Router();
-type OrderOfYandexDelivery = {
-  id: number;
-  name: string;
-  order: string;
-};
 
 orderRouter.post('/', (req, res) => {
   const { name, order } = req.body;
@@ -19,20 +14,20 @@ orderRouter.post('/', (req, res) => {
     return;
   }
 
-  const newOrder = getMockOrder();
+  const newOrder = getmockorder();
 
   logger.info(`Создан случайный заказ`);
   res.json(newOrder);
 });
 
 orderRouter.get('/', (req, res) => {
-  const orders = getMockOrder(5);
+  const orders = getmockorder(5);
   logger.info(`Сгенерировано 5 заказов`);
   res.json(orders);
 });
 
 orderRouter.get('/:id', (req, res) => {
-  const order = getMockOrder();
+  const order = getmockorder();
 
   logger.info(`Сгенерирован заказ`);
   res.json(order);
