@@ -5,7 +5,9 @@
   "main": "dist/index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "ts-node src/main.ts"
+    "start": "ts-node src/main.ts",
+    "build": "eslint . && tsc --noEmit",
+    "lint": "eslint ."
   },
   "prettier": {
     "singleQuote": true,
