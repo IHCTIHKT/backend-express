@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "start": "ts-node src/main.ts",
-    "build": "eslint . && tsc --noEmit",
+    "build": "tsc",
     "lint": "eslint .",
     "lint:src": "eslint src/ --max-warnings 0"
   },
