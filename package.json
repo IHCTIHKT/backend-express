@@ -5,7 +5,10 @@
   "main": "dist/index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "ts-node src/main.ts"
+    "start": "ts-node src/main.ts",
+    "build": "tsc",
+    "lint": "eslint .",
+    "lint:src": "eslint src/ --max-warnings 0"
   },
   "prettier": {
     "singleQuote": true,
