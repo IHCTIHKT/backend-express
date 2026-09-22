@@ -2,8 +2,8 @@ import express from 'express';
 import { getMockUser } from '../../mocks/get-user-mocks';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
-import { UserLoginDto } from './dto/user-login.dto';
-import { UserRegisterDto } from './dto/user-register.dto';
+import { UserLoginDto } from './user-login.dto';
+import { UserRegisterDto } from './user-register.dto';
 import { UserModel } from '../../database/models/user.model';
 
 const userRouter = express.Router();

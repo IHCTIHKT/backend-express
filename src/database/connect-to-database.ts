@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize-typescript';
 import logger from '../logger';
+import { OrderModel } from './models/order.model';
 import { UserModel } from './models/user.model';
 
 export const connectToDatabase = async () => {
@@ -12,7 +13,7 @@ export const connectToDatabase = async () => {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
   });
-  connection.addModels([UserModel]);
+  connection.addModels([UserModel, OrderModel]);
 
   try {
     await connection.authenticate();
