@@ -1,9 +1,6 @@
 import { IsInt, IsNumber, IsString } from 'class-validator';
 
-export class OrderCreateDto {
-  @IsInt()
-  userId: number;
-
+export class OrderUpdateDto {
   @IsString()
   product: string;
 
