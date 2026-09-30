@@ -23,7 +23,7 @@ export class OrderModel extends Model {
   public product: string;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.DECIMAL,
     allowNull: false,
   })
   public quantity: number;
@@ -39,10 +39,4 @@ export class OrderModel extends Model {
     allowNull: false,
   })
   public status: string;
-
-  @Column({
-    type: DataType.DATE,
-    allowNull: false,
-  })
-  public createdAt: Date;
 }

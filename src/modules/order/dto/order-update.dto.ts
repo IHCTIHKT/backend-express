@@ -1,10 +1,10 @@
-import { IsInt, IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class OrderUpdateDto {
   @IsString()
   product: string;
 
-  @IsInt()
+  @IsNumber()
   quantity: number;
 
   @IsNumber()

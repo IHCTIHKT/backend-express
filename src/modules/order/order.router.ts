@@ -5,6 +5,7 @@ import { OrderModel } from '../../database/models/order.model';
 import logger from '../../logger/index';
 import { OrderCreateDto } from './dto/order-create.dto';
 import { OrderDeleteDto } from './dto/order-delete.dto';
+import { OrderPaginationDto } from './dto/order-pagination.dto';
 import { OrderUpdateDto } from './dto/order-update.dto';
 
 const orderRouter = express.Router();
@@ -28,8 +29,18 @@ orderRouter.post('/', async (req, res) => {
 });
 
 orderRouter.get('/', async (req, res) => {
-  const orders = await OrderModel.findAll();
+  const orders = await OrderModel.findAll({});
+  const dto = plainToInstance(OrderPaginationDto, req.query);
+  const error = validateSync(dto);
+  if (error.length > 0) {
+    res.status(400).json(error);
+    return;
 
+    const orders = await OrderModel.findAll({
+      limit: dto.limit,
+      offset: dto.offset,
+    });
+  }
   logger.info(`Заказы найдены!`);
   res.json(orders);
 });
@@ -40,6 +51,11 @@ orderRouter.get('/:id', async (req, res) => {
       id: req.params.id,
     },
   });
+
+  if (order === null) {
+    res.status(404).json({ message: 'Заказ не найден' });
+    return;
+  }
 
   logger.info(`Заказ найден!`);
   res.json(order);

@@ -7,7 +7,7 @@ export class OrderCreateDto {
   @IsString()
   product: string;
 
-  @IsInt()
+  @IsNumber()
   quantity: number;
 
   @IsNumber()
