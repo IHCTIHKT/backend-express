@@ -1,26 +1,71 @@
-import express from 'express';
-import { getMockUser } from '../../mocks/get-user-mocks';
+import axios from 'axios';
+import { compare, hashSync } from 'bcrypt';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
+import { CronJob } from 'cron';
+import express from 'express';
+import { UserModel } from '../../database/models/user.model';
+import logger from '../../logger';
 import { UserLoginDto } from './user-login.dto';
 import { UserRegisterDto } from './user-register.dto';
-import { UserModel } from '../../database/models/user.model';
 
 const userRouter = express.Router();
 
-userRouter.post('/login', (req, res) => {
-  const dto = plainToInstance(UserLoginDto, req.body);
+const TempDomainListUpdates = new CronJob('* * * * *', loadDomain, null, true);
+
+let domains: string[] = [];
+
+export async function loadDomain() {
+  const response = await axios.get(
+    'https://raw.githubusercontent.com/disposable/disposable-email-domains/refs/heads/master/domains.txt',
+  );
+  domains = response.data.split('\n');
+  logger.info(`Всего временных доменов ${domains.length}`);
+}
+loadDomain();
+
+userRouter.post('/register', async (req, res) => {
+  const dto = plainToInstance(UserRegisterDto, req.body);
   const error = validateSync(dto);
   if (error.length > 0) {
     res.status(400).json(error);
     return;
   }
-  const user = getMockUser();
+
+  const domain = req.body.email.split('@')[1];
+  console.log(domain);
+
+  const isTemp = domains.find((d: string) => d === domain);
+
+  if (isTemp) {
+    res.status(400).json({
+      message: 'Регистрация на временную почту запрещена!!!',
+    });
+    return;
+  }
+  const userEmailSearch = await UserModel.findOne({
+    where: {
+      email: req.body.email,
+    },
+  });
+
+  if (userEmailSearch !== null) {
+    res.status(400).json({ message: 'Такой пользователь уже зарегистрирован!' });
+    return;
+  }
+
+  const hashedPassword = hashSync(req.body.password, 10);
+
+  const user = await UserModel.create({
+    email: req.body.email,
+    password: hashedPassword,
+  });
+
   res.json(user);
 });
 
-userRouter.post('/register', async (req, res) => {
-  const dto = plainToInstance(UserRegisterDto, req.body);
+userRouter.post('/login', async (req, res) => {
+  const dto = plainToInstance(UserLoginDto, req.body);
   const error = validateSync(dto);
   if (error.length > 0) {
     res.status(400).json(error);
@@ -32,15 +77,21 @@ userRouter.post('/register', async (req, res) => {
       email: req.body.email,
     },
   });
-  if (userEmailSearch !== null) {
-    res.status(400).json({ message: 'Такой пользователь уже зарегистрирован!' });
+
+  if (!userEmailSearch) {
+    res.status(400).json({ message: 'Неверный email или пароль' });
     return;
   }
+  const result = await compare(req.body.password, userEmailSearch.password);
 
-  const user = await UserModel.create({
-    email: req.body.email,
-    password: req.body.password,
+  if (!result) {
+    res.status(400).json({ message: 'Неверный email или пароль' });
+    return;
+  }
+  res.json({
+    id: userEmailSearch.id,
+    email: userEmailSearch.email,
   });
-  res.json(user);
 });
+
 export default userRouter;
