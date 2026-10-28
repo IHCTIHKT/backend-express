@@ -4,6 +4,8 @@ import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import { CronJob } from 'cron';
 import express from 'express';
+import * as jwt from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
 import { UserModel } from '../../database/models/user.model';
 import logger from '../../logger';
 import { UserLoginDto } from './user-login.dto';
@@ -62,7 +64,7 @@ userRouter.post('/register', async (req, res) => {
   });
 
   res.json(user);
-});
+});       
 
 userRouter.post('/login', async (req, res) => {
   const dto = plainToInstance(UserLoginDto, req.body);
@@ -88,10 +90,40 @@ userRouter.post('/login', async (req, res) => {
     res.status(400).json({ message: 'Неверный email или пароль' });
     return;
   }
+
+  const tokens = jwt.sign({ id: userEmailSearch.id }, 'secret', { expiresIn: '1h' });
+
   res.json({
     id: userEmailSearch.id,
     email: userEmailSearch.email,
+    token: tokens,
   });
 });
+userRouter.get('/profile', async (req, res) => {
+  const token = req.header('authorization')?.slice(7);
+  if (!token) {
+    return res.status(401).json({ message: 'Залогиньтесь!' });
+  }
+  try {
+    const data = verify(token, 'secret');
+    if (typeof data === 'object' && data !== null) {
+      const id = data.id;
+      const user = await UserModel.findByPk(id);
 
-export default userRouter;
+      console.log(id);
+
+      if (!user) {
+        return res.status(401).json({ message: 'Пользователь не найден!' });
+      }
+
+      return res.json({
+        id: user.id,
+        email: user.email,
+      });
+    }
+  } catch (error) {
+    return res.status(401).json({ message: 'Токен неверный или истек!' });
+  }
+
+  return res.json({ message: 'Вы пытаетесь прочесть профиль.' });
+});
