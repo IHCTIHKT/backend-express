@@ -5,9 +5,9 @@ import { validateSync } from 'class-validator';
 import { CronJob } from 'cron';
 import express from 'express';
 import * as jwt from 'jsonwebtoken';
-import { sign, verify } from 'jsonwebtoken';
 import { UserModel } from '../../database/models/user.model';
 import logger from '../../logger';
+import { verifyToken } from '../auth/verify-token';
 import { UserLoginDto } from './user-login.dto';
 import { UserRegisterDto } from './user-register.dto';
 
@@ -64,7 +64,7 @@ userRouter.post('/register', async (req, res) => {
   });
 
   res.json(user);
-});       
+});
 
 userRouter.post('/login', async (req, res) => {
   const dto = plainToInstance(UserLoginDto, req.body);
@@ -100,30 +100,52 @@ userRouter.post('/login', async (req, res) => {
   });
 });
 userRouter.get('/profile', async (req, res) => {
+
   const token = req.header('authorization')?.slice(7);
+
   if (!token) {
     return res.status(401).json({ message: 'Залогиньтесь!' });
   }
-  try {
-    const data = verify(token, 'secret');
-    if (typeof data === 'object' && data !== null) {
-      const id = data.id;
-      const user = await UserModel.findByPk(id);
 
-      console.log(id);
+  const user = await verifyToken(token);
 
-      if (!user) {
-        return res.status(401).json({ message: 'Пользователь не найден!' });
-      }
-
-      return res.json({
-        id: user.id,
-        email: user.email,
-      });
-    }
-  } catch (error) {
-    return res.status(401).json({ message: 'Токен неверный или истек!' });
+  if (!user) {
+    return res.status(401).json({
+      message: 'Токен неверный или пользователь не найден!',
+    });
   }
 
-  return res.json({ message: 'Вы пытаетесь прочесть профиль.' });
+  return res.json({
+    id: user.id,
+    email: user.email,
+  });
 });
+
+userRouter.put('/profile', async (req, res) => {
+
+  const token = req.header('authorization')?.slice(7);
+
+  if (!token) {
+    return res.status(401).json({ message: 'Залогиньтесь' });
+  }
+
+  const user = await verifyToken(token);
+
+  if (!user) {
+    return res.status(401).json({
+      message: 'Токен неверный или пользователь не найден!',
+    });
+  }
+
+  const updated = await user.update({
+    address: req.body.address,
+  });
+
+  return res.json({
+    id: user.id,
+    email: user.email,
+    address: updated.address,
+  });
+
+  });
+export default userRouter;

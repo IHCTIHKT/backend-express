@@ -1,11 +1,12 @@
 import express from 'express';
-import logger from './logger/index';
-import orderRouter from './modules/order/order.router';
-import userRouter from './modules/user/user.router';
 import { logRoutes } from './bootstrap/log-routes';
 import appConfig from './config';
-import { LogRequestMiddleware } from './middlewares/log-request.middleware';
 import { connectToDatabase } from './database/connect-to-database';
+import logger from './logger/index';
+import { LogRequestMiddleware } from './middlewares/log-request.middleware';
+import { adminRouter } from './modules/admin/admin.router';
+import orderRouter from './modules/order/order.router';
+import userRouter from './modules/user/user.router';
 
 const start = async () => {
   await connectToDatabase();
@@ -17,6 +18,7 @@ const start = async () => {
 
   server.use('/order', orderRouter);
   server.use('/user', userRouter);
+  server.use('/admin', adminRouter);
   logRoutes(server);
 
   server.listen(appConfig.port, () => {

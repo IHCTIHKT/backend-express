@@ -7,10 +7,24 @@ import { OrderCreateDto } from './dto/order-create.dto';
 import { OrderDeleteDto } from './dto/order-delete.dto';
 import { OrderPaginationDto } from './dto/order-pagination.dto';
 import { OrderUpdateDto } from './dto/order-update.dto';
+import { verifyToken } from '../auth/verify-token';
 
 const orderRouter = express.Router();
 
 orderRouter.post('/', async (req, res) => {
+
+  const token = req.header('authorization')?.slice(7);
+  if (!token) {
+    res.status(401).json({ message: 'Залогиньтесь!' });
+    return;
+  }
+
+  const user = await verifyToken(token);
+
+  if (!user) {
+    res.status(401).json({ message: 'Токен неверный или пользователь не найден!' });
+    return;
+  }
   const dto = plainToInstance(OrderCreateDto, req.body);
   const error = validateSync(dto);
   if (error.length > 0) {
@@ -18,7 +32,7 @@ orderRouter.post('/', async (req, res) => {
     return;
   }
   const newOrder = await OrderModel.create({
-    userId: dto.userId,
+    userId: user.id,
     product: dto.product,
     quantity: dto.quantity,
     price: dto.price,
@@ -29,26 +43,58 @@ orderRouter.post('/', async (req, res) => {
 });
 
 orderRouter.get('/', async (req, res) => {
-  const orders = await OrderModel.findAll({});
+
+  const token = req.header('authorization')?.slice(7);
+
+  if (!token) {
+    res.status(401).json({ message: 'Залогиньтесь!' });
+    return;
+  }
+
+  const user = await verifyToken(token);
+
+  if (!user) {
+    res.status(401).json({ message: 'Токен неверный или пользователь не найден!' });
+    return;
+  }
+
   const dto = plainToInstance(OrderPaginationDto, req.query);
   const error = validateSync(dto);
   if (error.length > 0) {
     res.status(400).json(error);
     return;
+    }
 
-    const orders = await OrderModel.findAll({
+  const orders = await OrderModel.findAll({
+    where: {
+      userId: user.id,
+      },
       limit: dto.limit,
       offset: dto.offset,
     });
-  }
   logger.info(`Заказы найдены!`);
   res.json(orders);
 });
 
 orderRouter.get('/:id', async (req, res) => {
+
+  const token = req.header('authorization')?.slice(7);
+  if (!token) {
+    res.status(401).json({ message: 'Залогиньтесь!' });
+    return;
+  }
+
+  const user = await verifyToken(token);
+
+  if (!user) {
+    res.status(401).json({ message: 'Токен неверный или пользователь не найден!' });
+    return;
+  }
+
   const order = await OrderModel.findOne({
     where: {
       id: req.params.id,
+      userId: user.id,
     },
   });
 
