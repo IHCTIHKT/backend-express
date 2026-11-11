@@ -25,6 +25,9 @@ export class UserModel extends Model {
   @Column({ type: DataType.ENUM, values: Object.values(UserRole), allowNull: false, defaultValue: UserRole.user })
   public role: UserRole;
 
+  @Column( {type: DataType.BOOLEAN, allowNull: false, defaultValue: true })
+  public isActive: boolean;
+
   @Column({ type: DataType.STRING, allowNull: true })
   public address: string | null;
 }

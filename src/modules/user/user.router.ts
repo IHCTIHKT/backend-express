@@ -91,6 +91,11 @@ userRouter.post('/login', async (req, res) => {
     return;
   }
 
+  if (!userEmailSearch.isActive) {
+    res.status(403).json({ message: 'Ваш профиль заблокирован!' })
+    return;
+  }
+
   const tokens = jwt.sign({ id: userEmailSearch.id }, 'secret', { expiresIn: '1h' });
 
   res.json({
@@ -101,13 +106,7 @@ userRouter.post('/login', async (req, res) => {
 });
 userRouter.get('/profile', async (req, res) => {
 
-  const token = req.header('authorization')?.slice(7);
-
-  if (!token) {
-    return res.status(401).json({ message: 'Залогиньтесь!' });
-  }
-
-  const user = await verifyToken(token);
+  const user = await verifyToken(req);
 
   if (!user) {
     return res.status(401).json({
@@ -123,13 +122,7 @@ userRouter.get('/profile', async (req, res) => {
 
 userRouter.put('/profile', async (req, res) => {
 
-  const token = req.header('authorization')?.slice(7);
-
-  if (!token) {
-    return res.status(401).json({ message: 'Залогиньтесь' });
-  }
-
-  const user = await verifyToken(token);
+  const user = await verifyToken(req);
 
   if (!user) {
     return res.status(401).json({

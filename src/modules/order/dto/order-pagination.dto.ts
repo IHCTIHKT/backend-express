@@ -1,5 +1,7 @@
 import { Type } from 'class-transformer';
-import { IsInt } from 'class-validator';
+import { IsEnum, IsInt, IsOptional } from 'class-validator';
+import { OrderStatus, OrderType  } from '../../../database/models/order.model';
+
 
 export class OrderPaginationDto {
   @Type(() => Number)
@@ -9,4 +11,12 @@ export class OrderPaginationDto {
   @Type(() => Number)
   @IsInt()
   offset: number;
+
+  @IsOptional()
+  @IsEnum(OrderType)
+  type?: OrderType;
+
+  @IsOptional()
+  @IsEnum(OrderStatus)
+  status?: OrderStatus;
 }

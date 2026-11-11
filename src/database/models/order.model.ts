@@ -1,5 +1,18 @@
 import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
+export enum OrderStatus {
+  cooking = 'cooking',
+  cancelled = 'cancelled',
+  delivering = 'delivering',
+  ready_to_pickup = 'ready_to_pickup',
+  done = 'done',
+}
+
+export enum OrderType {
+  delivery = 'delivery',
+  pickup = 'pickup',
+}
+
 @Table({ tableName: 'orders' })
 export class OrderModel extends Model {
   @Column({
@@ -35,8 +48,14 @@ export class OrderModel extends Model {
   public price: number;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.ENUM(...Object.values(OrderStatus)),
     allowNull: false,
   })
-  public status: string;
+  public status: OrderStatus;
+
+  @Column({
+    type: DataType.ENUM(...Object.values(OrderType)),
+    allowNull: false,
+  })
+  public type: OrderType;
 }

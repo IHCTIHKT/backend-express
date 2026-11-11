@@ -1,8 +1,7 @@
-import { IsInt, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsString,  } from 'class-validator';
+import { OrderType} from '../../../database/models/order.model';
 
 export class OrderCreateDto {
-  @IsInt()
-  userId: number;
 
   @IsString()
   product: string;
@@ -13,6 +12,6 @@ export class OrderCreateDto {
   @IsNumber()
   price: number;
 
-  @IsString()
-  status: string;
+  @IsEnum(OrderType)
+  type: OrderType;
 }
