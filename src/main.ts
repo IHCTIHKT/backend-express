@@ -6,6 +6,7 @@ import logger from './logger/index';
 import { LogRequestMiddleware } from './middlewares/log-request.middleware';
 import { adminRouter } from './modules/admin/admin.router';
 import orderRouter from './modules/order/order.router';
+import { telegramBot } from './modules/telegram/bot.delivery';
 import userRouter from './modules/user/user.router';
 
 const start = async () => {
@@ -20,6 +21,8 @@ const start = async () => {
   server.use('/user', userRouter);
   server.use('/admin', adminRouter);
   logRoutes(server);
+
+  telegramBot.launch();
 
   server.listen(appConfig.port, () => {
     logger.info(`Server started on port ${appConfig.port}`);

@@ -1,14 +1,19 @@
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import express from 'express';
+import { Op } from 'sequelize';
 import { OrderModel, OrderStatus, OrderType } from '../../database/models/order.model';
+import { UserModel } from '../../database/models/user.model';
+import { UserRole} from '../../database/models/user.model';
 import logger from '../../logger/index';
 import { verifyToken } from '../auth/verify-token';
+import { telegramBot } from '../telegram/bot.delivery';
 import { OrderCreateDto } from './dto/order-create.dto';
 import { OrderPaginationDto } from './dto/order-pagination.dto';
 import { OrderUpdateDto } from './dto/order-update.dto';
 
 const orderRouter = express.Router();
+const adminGroupChatId = '-1003776664052';
 
 orderRouter.post('/', async (req, res) => {
 
@@ -38,6 +43,21 @@ orderRouter.post('/', async (req, res) => {
     status: OrderStatus.cooking,
     type: dto.type,
   });
+      try {
+        await telegramBot.telegram.sendMessage(
+          adminGroupChatId,
+          `*🛎 НОВЫЙ ЗАКАЗ\\!*
+
+📦 *Заказ №${newOrder.id}*
+🍔 *Товар:* ${newOrder.product}
+🚚 *Тип:* ${newOrder.type === OrderType.delivery ? 'Доставка' : 'Самовывоз'}
+🔥 *Статус:* ${newOrder.status === OrderStatus.cooking ? 'Готовится' : newOrder.status}`,
+          // eslint-disable-next-line camelcase
+          { parse_mode: 'MarkdownV2' },
+        );
+      } catch (error) {
+        logger.error('Не удалось отправить уведомление в группу');
+      }
   logger.info(`Создан случайный заказ`);
   res.json(newOrder);
 });

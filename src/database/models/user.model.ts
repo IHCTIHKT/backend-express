@@ -1,6 +1,6 @@
 import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
-enum UserRole {
+export enum UserRole {
   user = 'user',
   admin = 'admin',
 }
@@ -30,4 +30,7 @@ export class UserModel extends Model {
 
   @Column({ type: DataType.STRING, allowNull: true })
   public address: string | null;
+
+  @Column({ type: DataType.BIGINT, allowNull: true })
+  public telegramId: string | null;
 }

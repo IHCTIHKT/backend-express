@@ -1,6 +1,7 @@
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import { Router } from 'express';
+import { Op } from 'sequelize';
 import { OrderModel, OrderStatus, OrderType } from '../../database/models/order.model';
 import { UserModel } from '../../database/models/user.model';
 import logger from '../../logger';
@@ -163,3 +164,20 @@ adminRouter.put('/users/:id', async (req, res) => {
     res.status(400).json({ message: 'Поле isActive должно быть true или false' });
     return;
   }
+  await user.update({ isActive });
+
+  if (!isActive) {
+    const orders = await OrderModel.findAll({
+      where: {
+        userId: user.id,
+        status: {
+          [Op.in]: [OrderStatus.cooking, OrderStatus.delivering, OrderStatus.ready_to_pickup],
+        },
+      },
+    });
+    for (const order of orders) {
+      await order.update({ status: OrderStatus.cancelled });
+    }
+  }
+  res.json(user);
+});
