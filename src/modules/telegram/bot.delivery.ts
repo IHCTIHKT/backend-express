@@ -1,4 +1,5 @@
 import { Markup, Telegraf } from 'telegraf';
+import { FoodModel } from "../../database/models/food.models";
 import { OrderModel, OrderStatus } from '../../database/models/order.model';
 import { UserModel, UserRole } from '../../database/models/user.model';
 
@@ -33,20 +34,31 @@ telegramBot.command('start', async (ctx) => {
 
   await ctx.sendMessage('🍔 Добро пожаловать в Fake Delivery! Выберите действие 👇', Markup.inlineKeyboard(buttons));
 });
-
 telegramBot.action('order_food', async (ctx) => {
   await ctx.answerCbQuery();
 
-  await ctx.sendMessage(
-    '🍔 Наше меню:\n\n' +
-      '1. ГазБургер — 250 ₽\n' +
-      '2. ГазПицца — 450 ₽\n' +
-      '3. ГазКола — 150 ₽\n' +
-      '4. Наггетсы — 200 ₽\n\n' +
-      'Выберите понравившиеся блюда!',
-  );
+  const foods = await FoodModel.findAll();
+  console.log('Блюда из БД:', foods);
+
+  const buttons = foods.map((food) => [Markup.button.callback(`${food.name} — ${food.price} ₽`, `food:${food.id}`)]);
+
+  await ctx.sendMessage('🍔 Наше меню:', Markup.inlineKeyboard(buttons));
 });
 
+telegramBot.action(/^food:(\d+)$/, async (ctx) => {
+  await ctx.answerCbQuery();
+
+  const foodId = Number(ctx.match[1]);
+
+  const food = await FoodModel.findByPk(foodId);
+
+  if (!food) {
+    await ctx.sendMessage('Блюдо не найдено!');
+    return;
+  }
+
+  await ctx.sendMessage(`Блюдо ${food.name} добавлено в корзину!`);
+});
 telegramBot.command('id', (ctx) => {
   console.log('Group id:', ctx.chat.id);
 });
@@ -86,7 +98,7 @@ telegramBot.command('cooking', async (ctx) => {
 🚚 Тип: ${order.type}`;
 
     await ctx.sendMessage(message, {
-      // eslint-disable-next-line camelcase
+
       parse_mode: 'MarkdownV2',
     });
   }
@@ -127,7 +139,7 @@ telegramBot.command('delivery', async (ctx) => {
 🚚 Тип: ${order.type}`;
 
     await ctx.sendMessage(message, {
-      // eslint-disable-next-line camelcase
+
       parse_mode: 'MarkdownV2',
     });
   }

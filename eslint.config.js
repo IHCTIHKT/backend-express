@@ -56,7 +56,7 @@ module.exports = [
         },
       ],
 
-      camelcase: 'error',
+      camelcase: 'off',
       'consistent-return': 'error',
       'default-case': 'off',
       eqeqeq: 'error',

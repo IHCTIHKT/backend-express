@@ -3,8 +3,7 @@ import { validateSync } from 'class-validator';
 import express from 'express';
 import { Op } from 'sequelize';
 import { OrderModel, OrderStatus, OrderType } from '../../database/models/order.model';
-import { UserModel } from '../../database/models/user.model';
-import { UserRole} from '../../database/models/user.model';
+import { UserModel, UserRole } from '../../database/models/user.model';
 import logger from '../../logger/index';
 import { verifyToken } from '../auth/verify-token';
 import { telegramBot } from '../telegram/bot.delivery';
@@ -52,7 +51,7 @@ orderRouter.post('/', async (req, res) => {
 🍔 *Товар:* ${newOrder.product}
 🚚 *Тип:* ${newOrder.type === OrderType.delivery ? 'Доставка' : 'Самовывоз'}
 🔥 *Статус:* ${newOrder.status === OrderStatus.cooking ? 'Готовится' : newOrder.status}`,
-          // eslint-disable-next-line camelcase
+           
           { parse_mode: 'MarkdownV2' },
         );
       } catch (error) {
